@@ -1,0 +1,15 @@
+
+
+<div class="login mb-1">
+
+  <%= render partial: "common/flash_message" %>
+
+  <%= form_with(scope: "session") do |f| %>
+    <%= f.text_field :company_code, class: "form-control mb-2", placeholder: "事業者ID", autofocus: "", autocomplete: "company_code", value: flash[:company_code] %>
+    <%= f.text_field :identifier, class: "form-control mb-2", placeholder: "ユーザーID", value: flash[:identifier] %>
+    <%= f.password_field :password, class: "form-control mb-2", placeholder: "パスワード", value: flash[:password] %>
+    <%= f.submit "ログイン", class: "btn btn-lg btn-primary mt-3 w-100 text-center" %>
+  <% end %>
+</div>
+  
+

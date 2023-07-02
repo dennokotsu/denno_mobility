@@ -1,0 +1,50 @@
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - ./db:/var/lib/mysql
+  redis:
+    image: redis:6
+    restart: always
+  web:
+    image: dennokotsu/denno-mobility:0.0.1
+    depends_on:
+      - db
+      - redis
+    restart: always
+    env_file: .env
+    environment:
+      TZ: Asia/Tokyo
+      SECRET_KEY_BASE:
+      RAILS_SERVE_STATIC_FILES: 1
+      RAILS_LOG_TO_STDOUT: 1
+      RAILS_DNS_REBINDING_ATTACK_PROTECTION_ALLOW_DOMAIN_1: $DOMAIN
+      DATABASE_URL: mysql2://root:@db:3306/db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+  https-portal:
+    image: steveltn/https-portal:1
+    depends_on:
+      - web
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file: .env
+    environment:
+      DOMAINS: "${DOMAIN} -> http://web:3000"
+      STAGE: production
+      ACCESS_LOG: stdout
+      ERROR_LOG: default
+      WEBSOCKET: "true"
+      CLIENT_MAX_BODY_SIZE: 128M
+    volumes:
+      - certs:/var/lib/https-portal
+      - ./nginx:/var/log/nginx
+volumes:
+  certs:
+    name: certs
+    driver: local

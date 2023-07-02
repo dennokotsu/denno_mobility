@@ -1,0 +1,89 @@
+<div class="content">
+  <div class="main-header fixed-top">
+    <div class="head_title float-start">
+      <h4>伝票 一覧</h4>
+    </div>
+    <%= form_with(url: slips_path, method: :get, data: { controller: "slips", turbo_frame: "slip-list" }) do |form| %>
+      <div class="head_title w-50 text-end float-end">
+        <%= form.date_field(:target_day, { class: "form-control", value: @target_day.strftime("%Y-%m-%d"), data: { action: "change->slips#date_select" } }) %>
+      </div>
+    <% end %>
+  </div>
+  
+  <%= turbo_frame_tag "slip-list", target: "_top" do %>
+    <div class="main_content">
+      <div class="slip_content bg-white position-relative">
+
+        <% # カレンダー時間帯ループ %>
+        <% @display_slips.each do |time, slips| %>
+          <div class="row border-bottom">
+            <div class="col-2 border-end">
+              <p class="text-left"><%= time %></p>
+            </div>
+            <div class="col-10 p-1">
+              <div class="row m-1">
+
+                <% # 該当時間内 伝票ループ %>
+                <% slips.each do |slip| %>
+
+                  <% if @current_user[:role] == USER_ROLE_ADMIN %>
+                    <% slip_name = slip[:name].length > 15 ? slip[:name][0..14] + "..." : slip[:name] %>
+                    <% slip_text = slip[:rep_user_id].present? ? "#{@rep_list_id[slip[:rep_user_id]]} : #{slip_name}" : "- #{slip_name}" %>
+                  <% else %>
+                    <% slip_text = "#{slip[:name]}" %>
+                  <% end %>
+
+                  <% if slip[:status] == SLIP_STATUS_COMPLETE %>
+                    <%= link_to slip_path(slip), { class: "col p-1 m-1 h-auto bg-secondary rounded text-white text-nowrap text-decoration-none" } do %>
+                      <p>完了<%= slip[:targeted_at].strftime("%H:%M") %></p></p>
+                      <p><%= slip_text %></p>
+                    <% end %>
+                  <% elsif slip[:status] == SLIP_STATUS_UNASSIGNED %>
+                    <%= link_to slip_path(slip), { class: "col p-1 m-1 h-auto bg-warning rounded text-dark text-nowrap text-decoration-none" } do %>
+                      <p>未割当<%= slip[:targeted_at].strftime("%H:%M") %></p>
+                      <p><%= slip_text %></p>
+                    <% end %>
+                  <% elsif slip[:status] == SLIP_STATUS_ASSIGNED %>
+                    <%= link_to slip_path(slip), { class: "col p-1 m-1 h-auto bg-warning rounded text-dark text-nowrap text-decoration-none" } do %>
+                      <p>確認中<%= slip[:targeted_at].strftime("%H:%M") %></p>
+                      <p><%= slip_text %></p>
+                    <% end %>
+                  <% elsif slip[:status] == SLIP_STATUS_REJECT %>
+                    <%= link_to slip_path(slip), { class: "col p-1 m-1 h-auto bg-danger rounded text-white text-nowrap text-decoration-none" } do %>
+                      <p>拒否<%= slip[:targeted_at].strftime("%H:%M") %></p>
+                      <p><%= slip_text %></p>
+                    <% end %>
+                  <% elsif slip[:status] == SLIP_STATUS_ACCEPT %>
+                    <%= link_to slip_path(slip), { class: "col p-1 m-1 h-auto bg-success rounded text-white text-nowrap text-decoration-none" } do %>
+                      <p>受領<%= slip[:targeted_at].strftime("%H:%M") %></p>
+                      <p><%= slip_text %></p>
+                    <% end %>
+                  <% elsif slip[:status] == SLIP_STATUS_PICKUP %>
+                    <%= link_to slip_path(slip), { class: "col p-1 m-1 h-auto bg-primary rounded text-white text-nowrap text-decoration-none" } do %>
+                      <p>迎車中<%= slip[:targeted_at].strftime("%H:%M") %></p>
+                      <p><%= slip_text %></p>
+                    <% end %>
+                  <% elsif slip[:status] == SLIP_STATUS_DELIVER %>
+                    <%= link_to slip_path(slip), { class: "col p-1 m-1 h-auto bg-primary rounded text-white text-nowrap text-decoration-none" } do %>
+                      <p>実車中<%= slip[:targeted_at].strftime("%H:%M") %></p>
+                      <p><%= slip_text %></p>
+                    <% end %>
+                  <% end %>
+                <% end %>
+                <% # 該当時間内 伝票ループ %>
+
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <% # カレンダー時間帯ループ %>
+
+      </div>
+    </div>
+  <% end %>
+
+</div>
+
+<%= render partial: "common/footer_menu" %>
+<%= render partial: "common/sidebar" %>
+<%= render partial: "common/geo" %>

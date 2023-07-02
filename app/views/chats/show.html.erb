@@ -1,0 +1,49 @@
+<script>
+  chat_auto_reload = false
+</script>
+
+<div class="headind_srch bg-light fixed-top">
+  <div class="head_title text-center">
+    <h4>
+      <%= @title %>
+    </h4>
+  </div>
+</div>
+
+
+<div id=msg_history class="msg_history bg-white">
+  <div id="chat_channel_room" name=<%= @chat_channel_room %> company-id=<%= @current_company.id %> ></div>
+
+  <% # メッセージ本体は遅延読み込み %>
+  <%= turbo_frame_tag "message_content", src: @message_url do %>
+
+    <% # ローディングアイコン %>
+    <div class="fa-10x text-center text-secondary" >
+      <i class="fas fa-spinner fa-pulse"></i>
+    </div>
+
+  <% end %>
+</div>
+
+<% # チャットメッセージ 入力欄 %>
+<%= form_with(scope: "chat_message", url: @message_url, method: "patch", data: { controller: "chat", action: "turbo:submit-end->chat#reset_form", turbo_frame: "message_content" }) do |form| %>
+  
+  <div class="type_msg bg-white fixed-bottom">
+    <div class="input_msg_write mx-0">
+      <div class="d-flex align-items-center item-center ">
+        <label class="btn text-white me-1 msg_send_btn" data-chat-target="file_btn">
+          <i class="fas fa-file" data-chat-target="file_icon"></i>
+          <%= form.file_field :picture, { class: "form-control", data: { chat_target: "picture", action: "change->chat#pic_check" } } %>
+        </label >
+        <%= form.text_field :message, { class: "mx-1", placeholder: "メッセージ入力", autocomplete: "off", data: { chat_target: "message" } } %>
+        <button class="btn text-white msg_send_btn">
+          <i class="fas fa-play"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= render partial: "common/footer_menu" %>
+<%= render partial: "common/sidebar" %>
+<%= render partial: "common/geo" %>

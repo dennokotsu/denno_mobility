@@ -1,0 +1,53 @@
+<div class="content">
+
+  <div class="main-header fixed-top">
+    <div class="head_title float-start">
+      <h4>設定一覧</h4>
+    </div>
+  </div>
+
+  <div class="main_content">
+
+    <% unless @is_admin %>
+      <div class="row m-3">
+        <%= link_to edit_settings_user_path(@current_user), class: "btn btn-outline-secondary btn-light" do %>
+          <i class="fas fa-user fa-2x"></i>
+          <br>
+          <div>プロフィール設定</div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @is_admin %>
+      <div class="row m-3">
+        <%= link_to settings_users_path, class: "btn btn-outline-secondary btn-light" do %>
+          <i class="fas fa-user fa-2x"></i>
+          <br>
+          <div>ユーザー登録、編集</div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @is_admin %>
+      <div class="row m-3">
+        <%= link_to settings_groups_path, class: "btn btn-outline-secondary btn-light" do %>
+          <i class="fas fa-users fa-2x"></i>
+          <br>
+          <div>グループ登録、編集</div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="row m-3">
+      <%= link_to login_path, class: "btn btn-secondary" do %>
+        <i class="fas fa-sign-out-alt fa-2x"></i>
+        <br>
+        <div>ログアウト</div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= render partial: "common/footer_menu" %>
+<%= render partial: "common/sidebar" %>
+<%= render partial: "common/geo" %>

@@ -1,0 +1,10 @@
+<% # サイドバー %>
+<%= turbo_frame_tag "sidebar", src: sidebar_index_path do %>
+  <div class="fixed-top float-start m-1" >
+    <% if @current_user.avatar.representable? %>
+      <%= image_tag @current_user.avatar.representation(resize_to_fill: [35, 35]), class: "my_icon" %>
+    <% else %>
+      <button class="my_icon" type="button"><i class="fas fa-user" aria-hidden="true"></i></button>
+    <% end %>
+  </div>
+<% end %>

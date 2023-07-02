@@ -1,0 +1,19 @@
+ja:
+  activerecord:
+    attributes:
+      user:
+        name: 名前
+        password: パスワード
+        password_confirmation: パスワード(確認)
+        identifier: ID
+      slip:
+        name: 伝票名
+      area:
+        name: 地点名
+        sort: ソートNo
+      group:
+        name: グループ名
+    errors:
+      models:
+        user:
+          blank: を入力して下さい。

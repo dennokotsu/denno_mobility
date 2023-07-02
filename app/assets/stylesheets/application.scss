@@ -1,0 +1,341 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS (and SCSS, if configured) file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+// Custom bootstrap variables must be set or imported *before* bootstrap.
+@import "bootstrap";
+
+// デバッグ用、turbo-frame 使用している所をわかりやすくする ////////////////////////////////////////////////////////////////////////////////////////////////
+
+// turbo-frame {
+//   border: 1px red solid;
+//   display: block;
+// }
+
+// turbo-frame::before {
+//   content: "Frame: #"attr(id);
+//   position: relative;
+//   top: -14px;
+//   right: -4px;
+//   display: inline-block;
+//   color: red;
+//   font-size: 12px;
+//   z-index: 9999;
+//   background-color: white;
+//   padding: 4px;
+//   border: 1px red solid;
+// }
+
+// 共通系 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+html {
+  // background-color: #f8f9fa;
+  background-color: #ffffff;
+}
+
+.content {
+  height: auto;
+  margin: auto;
+}
+
+img {
+  max-width: 100%;
+}
+
+.background-image-container {
+  background-image: image_url("icon.png");
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  opacity: 0.4;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+// ログイン用 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.login {
+  max-width: 350px;
+  padding: 40px 40px;
+  background-color: #f7f7f7;
+  margin: 0 auto 25px;
+  margin-top: 50px;
+  border-radius: 2px;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
+}
+
+// ヘッダ用 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.main-header {
+  background-color: #f8f9fa;
+  padding: 10px;
+  overflow: hidden;
+  border-bottom: 1px solid #c4c4c4;
+}
+
+.head_title h4 {
+  color: #071743;
+  font-size: 21px;
+  margin: auto;
+  padding-left: 35px;
+}
+
+.headind_srch {
+  padding: 10px;
+  overflow: hidden;
+  border-bottom: 1px solid #c4c4c4;
+}
+
+// サイドバー用 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.sidebar {
+  max-width: 250px;
+  min-width: 250px;
+  transition: 0.2s all ease;
+  position: fixed;
+  top: 0px;
+  left: -250px;
+  z-index: 2000;
+}
+
+// メインコンテンツ用 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.main_content {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  overflow-y: scroll;
+}
+
+.slip_content {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 12px;
+  padding-right: 12px;
+  overflow-y: auto;
+}
+
+.slip_content p {
+  margin: 0;
+}
+
+.chat_list {
+  border-bottom: 1px solid #c4c4c4;
+  margin: 0;
+  padding: 18px 16px 10px;
+  position: relative;
+}
+
+.active_chat {
+  background: #ebebeb;
+}
+
+.chat_ib {
+  float: left;
+  padding: 0 0 0 15px;
+  width: 88%;
+}
+
+.chat_ib h5 {
+  font-size: 15px;
+  color: #464646;
+  margin: 0 0 8px 0;
+}
+
+.chat_ib h5 span {
+  font-size: 13px;
+  float: right;
+}
+
+.chat_ib p {
+  font-size: 14px;
+  color: #989898;
+  margin: auto;
+}
+
+.chat_img {
+  float: left;
+  width: 40px;
+  height: 40px;
+}
+
+.chat_img img {
+  border-radius: 50%;
+}
+
+.chat_people {
+  overflow: hidden;
+  clear: both;
+}
+
+.unread_icon {
+  font-size: small;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: red;
+  text-align: center;
+  line-height: 20px;
+  position: absolute;
+  bottom: 15px;
+}
+
+.time_date_sent {
+  color: #747474;
+  display: block;
+  font-size: 12px;
+  margin: 3px 0 0;
+  text-align: right;
+}
+
+.time_date_receive {
+  color: #747474;
+  display: block;
+  font-size: 12px;
+  margin: 3px 0 0;
+  text-align: left;
+}
+
+.msg_history {
+  overflow-y: auto;
+  float: left;
+  padding: 50px 15px 100px 15px;
+  width: 100%;
+}
+
+.outgoing_msg {
+  float: right;
+  overflow: hidden;
+  margin: 10px 0 10px;
+}
+
+.outgoing_msg p {
+  background: #3c8dbc none repeat scroll 0 0;
+  border-radius: 3px;
+  font-size: 14px;
+  margin: 0;
+  color: #fff;
+  padding: 5px 10px 5px 12px;
+  width: 100%;
+}
+
+.incoming_msg {
+  overflow: hidden;
+  margin: 10px 0 10px;
+  display: inline-block;
+  padding: 0 0 0 10px;
+  vertical-align: top;
+}
+
+.incoming_msg p {
+  background: #ebebeb none repeat scroll 0 0;
+  border-radius: 3px;
+  color: #646464;
+  font-size: 14px;
+  margin: 0;
+  padding: 5px 10px 5px 12px;
+  width: 100%;
+}
+
+.input_msg_write input[type="text"] {
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+  border: medium none;
+  color: #4c4c4c;
+  height: 40px;
+  width: 100%;
+}
+
+.input_msg_write input[type="file"] {
+  display: none;
+}
+
+.input_msg_write input[type="submit"] {
+  display: none;
+}
+
+.msg_send_btn {
+  background: #071743 none repeat scroll 0 0;
+  border: medium none;
+  border-radius: 10%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 17px;
+  right: 0;
+  top: 11px;
+}
+
+.msg_send_btn_selected {
+  // background: #071743 none repeat scroll 0 0;
+  background: #771b36 none repeat scroll 0 0;
+  border: medium none;
+  border-radius: 10%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 17px;
+  right: 0;
+  top: 11px;
+}
+
+.type_msg {
+  border-top: 1px solid #c4c4c4;
+  height: 50px;
+  padding: 5px 5px 95px 5px;
+}
+
+.my_icon {
+  background: #071743 none repeat scroll 0 0;
+  padding: initial;
+  border: medium none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  height: 35px;
+  width: 35px;
+  position: static;
+  float: left;
+}
+
+.user_icon {
+  background: #071743 none repeat scroll 0 0;
+  padding: initial;
+  border: medium none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  height: 40px;
+  width: 40px;
+  position: static;
+  float: left;
+}
+
+.long_message {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// フッター用 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.content_footer {
+  border-top: 1px solid #c4c4c4;
+  background-color: #f8f9fa;
+  padding: 5px 10px;
+  overflow: hidden;
+  height: 50px;
+}

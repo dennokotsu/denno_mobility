@@ -1,0 +1,355 @@
+<%= render partial: "common/flash_message" %>
+
+<% @slip.errors.full_messages.each do |message| %>
+  <div class="alert alert-warning"><%= message %></div>
+<% end %>
+
+<% is_new = action_name.in?(["new", "create"]) %>
+<% is_show = action_name == "show" %>
+<% is_edit = action_name.in?(["edit", "update"]) %>
+
+<% url = @slip.new_record? ? slips_path : slip_path %>
+
+<%= form_with(model: @slip, url: url, data: { controller: "slip" }) do |form| %>
+
+  <% # 伝票ステータス %>
+  <% if is_show %>
+    <div class="row mb-2">
+      <div class="col fs-2">
+        <% if @slip[:status] == SLIP_STATUS_UNASSIGNED %>
+          <div class="text-warning">担当者未割当</div>
+        <% elsif @slip[:status] == SLIP_STATUS_ASSIGNED %>
+          <div class="text-warning">担当者確認中</div>
+        <% elsif @slip[:status] == SLIP_STATUS_REJECT %>
+          <div class="text-danger">受領拒否</div>
+        <% elsif @slip[:status] == SLIP_STATUS_ACCEPT %>
+          <div class="text-primary">受領済み</div>
+        <% elsif @slip[:status] == SLIP_STATUS_PICKUP %>
+          <div class="text-primary"><%= "#{@pickup_start_time.strftime("%H:%M")}に迎車状態になりました。" %></div>
+        <% elsif @slip[:status] == SLIP_STATUS_DELIVER %>
+          <div class="text-primary"><%= "#{@pickup_time.strftime("%H:%M")}に乗車状態になりました。" %></div>
+        <% elsif @slip[:status] == SLIP_STATUS_COMPLETE %>
+          <div class="text-success">完了</div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="row mb-2">
+    <% if is_show && @slip[:status] == SLIP_STATUS_ASSIGNED && @current_user[:id] == @slip[:rep_user_id] %>
+      <div class="col">
+        <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#modal_slip_accept"> 受領 </button>
+      </div>
+      <div class="col">
+        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#modal_slip_reject"> 拒否 </button>
+      </div>
+    <% end %>
+    <% if is_show && @slip[:status] == SLIP_STATUS_ACCEPT && (@is_admin || @current_user[:id] == @slip[:rep_user_id]) %>
+      <div class="col">
+        <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#modal_slip_pickup"> 迎車状態に変更 </button>
+      </div>
+    <% end %>
+    <% if is_show && @slip[:status] == SLIP_STATUS_PICKUP && (@is_admin || @current_user[:id] == @slip[:rep_user_id]) %>
+      <div class="col">
+        <button type="button" class="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#modal_slip_deliver"> 乗車状態に変更 </button>
+      </div>
+    <% end %>
+    <% if is_show && @slip[:status] == SLIP_STATUS_DELIVER && (@is_admin || @current_user[:id] == @slip[:rep_user_id]) %>
+      <div class="col">
+        <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#modal_slip_status_complete"> 降車し完了する </button>
+      </div>
+    <% end %>
+  </div>
+
+  <% if is_show %>
+    <div class="mb-3">
+      <% if @pickup_start_time.present? %>
+        <h4 class="mb-1 text-secondary"><%= "迎車時刻：#{@pickup_start_time.strftime("%H時%M分")}" %></h4>
+      <% end %>
+      <% if @pickup_time.present? %>
+        <h4 class="mb-1 text-secondary"><%= "乗車時刻：#{@pickup_time.strftime("%H時%M分")}" %></h4>
+      <% end %>
+      <% if @getoff_time.present? %>
+        <h4 class="mb-1 text-secondary"><%= "完了時刻：#{@getoff_time.strftime("%H時%M分")}" %></h4>
+      <% end %>
+      <% if @distance.present? %>
+        <h4 class="mb-1 text-secondary"><%= "乗車距離：#{@distance} km" %></h4>
+      <% end %>
+      <% if @payment.present? %>
+        <h4 class="mb-1 text-secondary"><%= "収受運賃：#{@payment} 円" %></h4>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% # 伝票作成上必須となる項目 %>
+  <div class="mb-3 form-group">
+    <%= form.label :name, "伝票名" %>
+    <%= form.text_field :name, { class: "form-control", disabled: @disabled, placeholder: "伝票名を入力して下さい" } %>
+  </div>
+  
+  <% targeted_at = @slip[:targeted_at].present? ? @slip[:targeted_at] : Time.zone.now %>
+  <div class="mb-3 form-group">
+    <%= form.label :targeted_at, "対象日時" %>
+    <%= form.datetime_field :targeted_at, { class: "form-control", value: targeted_at.strftime("%Y-%m-%dT%H:%M"), disabled: @disabled } %>
+  </div>
+
+  <div class="mb-3 form-group">
+    <%= form.label :rep_user_id, "担当者" %>
+    <div class="row">
+      <div class="col-10">
+        <%= form.select :rep_user_id, @rep_list, { selected: @slip[:rep_user_id], prompt: "未選択" }, { class: "form-control", disabled: @disabled } %>
+      </div>
+      <div class="col-2">
+        <% if is_show && @slip[:rep_user_id].present? && @slip[:rep_user_id] != @current_user[:id] %>
+          <a class="w-100 btn btn-outline-secondary" href="<%= chat_path(@slip[:rep_user_id]) %>"><i class="fas fa-user"></i></a>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <% # 設定により任意追加可能な項目 %>
+  <% @slip_attribute_settings.each do |setting| %>
+
+    <% # テキストフォーム %>
+    <% if setting["type"] == "text" %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <%= form.text_field setting["name"], { class: "form-control", value: @slip_attributes[setting["name"]], disabled: @attribute_disabled[setting["name"]], placeholder: setting["placeholder"] } %>
+      </div>
+    <% end %>
+
+    <% # テキストエリア %>
+    <% if setting["type"] == "text_area" %>
+      <% row = setting["row"].present? ? setting["row"].to_s : "3" %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <%= form.text_area setting["name"], { class: "form-control", value: @slip_attributes[setting["name"]], rows: row, disabled: @attribute_disabled[setting["name"]], placeholder: setting["placeholder"] } %>
+      </div>
+    <% end %>
+
+    <% # 数値フォーム %>
+    <% if setting["type"] == "number" %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <%= form.number_field setting["name"], { class: "form-control", value: @slip_attributes[setting["name"]], disabled: @attribute_disabled[setting["name"]], placeholder: setting["placeholder"] } %>
+      </div>
+    <% end %>
+
+    <% # 電話番号フォーム %>
+    <% if setting["type"] == "tel" %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <div class="row">
+          <div class="col-6">
+            <%= form.phone_field setting["name"], { class: "form-control", value: @slip_attributes[setting["name"]], disabled: @attribute_disabled[setting["name"]], placeholder: setting["placeholder"] } %>
+          </div>
+          <% if is_show && @slip_attributes[setting["name"]].present? %>
+            <div class="col-2">
+              <a class="w-100 btn btn-outline-secondary" href="tel:<%= @slip_attributes[setting["name"]] %>"><i class="fas fa-phone"></i></a>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # メールアドレスフォーム %>
+    <% if setting["type"] == "email" %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <div class="row">
+          <div class="col-10">
+            <%= form.email_field setting["name"], { class: "form-control", value: @slip_attributes[setting["name"]], disabled: @attribute_disabled[setting["name"]], placeholder: setting["placeholder"] } %>
+          </div>
+          <% if is_show && @slip_attributes[setting["name"]].present? %>
+            <div class="col-2">
+              <a class="w-100 btn btn-outline-secondary" href="mailto:<%= @slip_attributes[setting["name"]] %>"><i class="fas fa-envelope"></i></a>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # 住所フォーム(文字列) %>
+    <% if setting["type"] == "map_text" %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <div class="row">
+          <div class="col-10">
+            <%= form.text_field setting["name"], { class: "form-control", value: @slip_attributes[setting["name"]], disabled: @attribute_disabled[setting["name"]], placeholder: setting["placeholder"] } %>
+          </div>
+          <% if is_show && @slip_attributes[setting["name"]].present? %>
+            <div class="col-2">
+              <% map_url = "https://www.google.co.jp/maps/place/#{@slip_attributes[setting["name"]]}" %>
+              <a class="w-100 btn btn-outline-secondary" href=<%= map_url %>><i class="fas fa-map-marked-alt"></i></a>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # 日付フォーム %>
+    <% if setting["type"] == "date" %>
+      <% value = @slip_attributes[setting["name"]].present? ? @slip_attributes[setting["name"]].strftime("%Y-%m-%d") : nil %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <%= form.date_field setting["name"], { class: "form-control", value: value, disabled: @attribute_disabled[setting["name"]] } %>
+      </div>
+    <% end %>
+
+    <% # 日時フォーム %>
+    <% if setting["type"] == "datetime" %>
+      <% value = @slip_attributes[setting["name"]].present? ? @slip_attributes[setting["name"]].strftime("%Y-%m-%dT%H:%M") : nil %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <%= form.datetime_field setting["name"], { class: "form-control", value: value, disabled: @attribute_disabled[setting["name"]] } %>
+      </div>
+    <% end %>
+
+    <% # セレクトフォーム %>
+    <% if setting["type"] == "select" %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <%= form.select setting["name"], setting["data"], { selected: @slip_attributes[setting["name"]] }, { class: "form-control", multiple: setting["multiple"], disabled: @attribute_disabled[setting["name"]] } %>
+      </div>
+    <% end %>
+
+  <% end %>
+
+  <div class="mt-3">
+    <div class="row">
+      <% if is_show %>
+        <div class="col">
+          <%= link_to "一覧", slips_path(target_day: @slip[:targeted_at].strftime("%Y-%m-%d")), { class: "btn btn-outline-dark w-100" } %>
+        </div>
+      <% elsif is_edit %>
+        <div class="col">
+          <%= link_to "取消", slip_path(@slip), { class: "btn btn-outline-dark w-100" } %>
+        </div> 
+      <% end %>
+      <% if is_show && @is_admin %>
+        <div class="col">
+          <%= link_to "編集", edit_slip_path(@slip), { class: "btn btn-warning w-100" } %>
+        </div>
+      <% end %>
+      <% if is_new || is_edit %>
+        <div class="col">
+          <%= form.submit "登録", { class: "btn btn-warning w-100" } %>
+        </div>
+      <% end %>
+      <% if is_show && @is_admin && @slip[:status] != SLIP_STATUS_COMPLETE %>
+        <div class="col">
+          <%= link_to "削除", slip_path(@slip), class: "btn btn-danger w-100", data: { turbo_method: :delete, turbo_confirm: "伝票を削除しますか？" } %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+
+<% end %>
+
+<!-- 受領確認モーダル -->
+<div class="modal fade" id="modal_slip_accept" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_with(model: @slip, url: url) do |form| %>
+        <%= hidden_field_tag :status, "accept" %>
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">伝票を受領しますか？</h5>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+          <%= form.submit "OK", { class: "btn btn-primary" } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- 拒否確認モーダル -->
+<div class="modal fade" id="modal_slip_reject" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_with(model: @slip, url: url) do |form| %>
+        <%= hidden_field_tag :status, "reject" %>
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">伝票を拒否しますか？</h5>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+          <%= form.submit "OK", { class: "btn btn-primary" } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- 迎車状態へ変更確認モーダル -->
+<div class="modal fade" id="modal_slip_pickup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_with(model: @slip, url: url) do |form| %>
+        <%= hidden_field_tag :status, "pickup" %>
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">迎車状態に変更しますか？</h5>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">いいえ</button>
+          <%= form.submit "はい", { class: "btn btn-primary" } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- 実車状態へ変更確認モーダル -->
+<div class="modal fade" id="modal_slip_deliver" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_with(model: @slip, url: url) do |form| %>
+        <%= hidden_field_tag :status, "deliver" %>
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">乗車状態に変更しますか？</h5>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">いいえ</button>
+          <%= form.submit "はい", { class: "btn btn-primary" } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- 運行完了確認モーダル -->
+<div class="modal fade" id="modal_slip_status_complete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_with(model: @slip, url: url) do |form| %>
+        <%= hidden_field_tag :status, "complete" %>
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">完了状態に変更しますか？</h5>
+        </div>
+        <div class="modal-body">
+          乗車距離と収受運賃を入力して下さい
+          <br>
+          <div class="row mt-3">
+            <div class="col">
+              <label for="get_off_distance">乗車距離(km)</label>
+              <%= form.number_field "get_off_distance", { class: "form-control", placeholder: "乗車距離を入力して下さい(km)", step: "0.1" } %>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col">
+              <label for="get_off_payment">収受運賃(円)</label>
+              <%= form.number_field "get_off_payment", { class: "form-control", placeholder: "収受運賃を入力して下さい" } %>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+          
+          <%= form.submit "完了", { class: "btn btn-primary" } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

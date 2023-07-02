@@ -1,0 +1,10 @@
+development:
+  adapter: async
+
+test:
+  adapter: test
+
+production:
+  adapter: redis
+  url: <%= "redis://#{ENV.fetch("REDIS_HOST") { "localhost" }}:#{ENV.fetch("REDIS_PORT") { "6379" }}/1" %>
+  channel_prefix: denno_mobility_production

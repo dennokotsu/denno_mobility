@@ -1,0 +1,30 @@
+<% # 共通メッセージ %>
+<% flash.each do |message_type, message| %>
+  <% if message_type == "primary" %>
+    <div class="alert alert-primary"><%= message.html_safe %></div>
+  <% end %>
+  <% if message_type == "secondary" %>
+    <div class="alert alert-secondary"><%= message.html_safe %></div>
+  <% end %>
+  <% if message_type == "secondary" %>
+    <div class="alert alert-secondary"><%= message.html_safe %></div>
+  <% end %>
+  <% if message_type == "success" %>
+    <div class="alert alert-success"><%= message.html_safe %></div>
+  <% end %>
+  <% if message_type == "danger" %>
+    <div class="alert alert-danger"><%= message.html_safe %></div>
+  <% end %>
+  <% if message_type == "warning" %>
+    <div class="alert alert-warning"><%= message.html_safe %></div>
+  <% end %>
+  <% if message_type == "info" %>
+    <div class="alert alert-info"><%= message.html_safe %></div>
+  <% end %>
+  <% if message_type == "light" %>
+    <div class="alert alert-light"><%= message.html_safe %></div>
+  <% end %>
+  <% if message_type == "dark" %>
+    <div class="alert alert-dark"><%= message.html_safe %></div>
+  <% end %>
+<% end %>

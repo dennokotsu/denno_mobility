@@ -1,0 +1,37 @@
+<div class="content">
+  <div class="main-header fixed-top">
+    <div class="head_title float-start"> 
+      <h4>グループ 一覧</h4>
+    </div>
+  </div>
+
+  <div class="main_content ">
+
+    <div class="d-flex justify-content-end px-1">
+      <%= link_to "新規グループ登録", new_settings_group_path, class: "btn btn-outline-secondary btn-light text-nowrap my-1 w-50" %>
+    </div>
+
+    <div class="list-group px-1">
+      <% @groups.each do |group| %>
+        <%= link_to edit_settings_group_path(group), class: "list-group-item list-group-item-action d-flex gap-3 py-3" do %>
+
+          <div class="d-flex gap-2 w-100 justify-content-between">
+            <div>
+              <h6 class="mb-0"><%= group[:name] %></h6>
+              <div class="mb-0 opacity-75">メンバー : <%= @group_users_text[group[:id]] %></div>
+            </div>
+          </div>
+          
+        <% end %>
+
+      <% end %>
+    </div>
+    <!-- /アイコン付きリストグループ -->
+
+  </div>  
+
+</div>
+
+<%= render partial: "common/footer_menu" %>
+<%= render partial: "common/sidebar" %>
+<%= render partial: "common/geo" %>

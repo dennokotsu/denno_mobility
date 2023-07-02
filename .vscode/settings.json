@@ -1,0 +1,58 @@
+{
+  "files.insertFinalNewline": true,
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.prettierPath": "./node_modules/prettier",
+
+  "ruby.useLanguageServer": true,
+  "ruby.intellisense": "rubyLocate",
+  "ruby.format": "rubocop",
+  "ruby.useBundler": true,
+  "ruby.lint": {
+    "rubocop": {
+      "useBundler": true,
+      "except": ["Metrics"],
+    }
+  },
+
+  "[ruby]": {
+    "editor.defaultFormatter": "rebornix.ruby",
+    "editor.formatOnSave": true,
+  },
+
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+
+  "[jsonc]": {
+    "editor.formatOnSave": false,
+  },
+
+  "cSpell.ignoreRegExpList": [
+    "armg",
+    "activerecord",
+    "countup",
+    "datetime",
+    "denno",
+    "getoff",
+    "hotwire",
+    "importmap",
+    "kotsu",
+    "rgeo",
+    "rubocop",
+    "urlsafe",
+  ],
+}

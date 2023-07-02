@@ -1,0 +1,117 @@
+<% # 乗務員検索 %>
+
+<div class="content">
+  <div class="main-header fixed-top">
+    <div class="head_title float-start"> 
+      <h4>チャット 一覧</h4>
+    </div>
+  </div>
+
+  <% # 乗務員一覧 %>
+  <div class="main_content position-relative">
+
+    <div data-controller="chats">
+      <%= turbo_frame_tag "chat-list" do %>
+
+        <% # 自動更新用 %>
+        <%= link_to "", chats_path, { class: "d-none", data: { chats_target: "reload" } } %>
+
+        <% # 全体チャット %>
+        <div class="chat_list">
+          <div class="chat_people ">
+            <button class="user_icon" type="button"><i class="fas fa-users" aria-hidden="true"></i></button>
+            <% if @unread_all_count.present? && @unread_all_count > 0 %>
+              <div class="unread_icon text-white"><%= @unread_all_count %></div>
+            <% end %>
+            <div class="chat_ib">
+              <h5>全体メッセージ <span class="chat_date"><%= @last_all_message_time.present? ? @last_all_message_time : "" %></span></h5>
+              <p class="long_message"><%= @last_all_message.present? ? "#{@last_all_message_user[:name]} : #{@last_all_message[:data]["message"]}" : "" %></p>
+            </div>
+          </div>
+          <%= link_to "", chat_path(id: "all"), { class: "stretched-link", data: { turbo_frame: "_top" } } %>
+        </div>
+
+        <% # グループチャット %>
+        <% @groups.each do |group| %>
+          <div class="chat_list">
+            <div class="chat_people ">
+              <button class="user_icon" type="button"><i class="fas fa-users" aria-hidden="true"></i></button>
+              <% if @unread_group_count[group[:id]].present? && @unread_group_count[group[:id]] > 0 %>
+                <div class="unread_icon text-white"><%= @unread_group_count[group[:id]] %></div>
+              <% end %>
+              <div class="chat_ib">
+                <h5><%= group[:name] %><span class="chat_date"><%= @last_group_message_times[group[:id]].present? ? @last_group_message_times[group[:id]] : "" %></span></h5>
+                <p class="long_message"><%= @last_group_messages[group[:id]].present? ? "#{@last_group_messages_user[group[:id]][:name]} : #{@last_group_messages[group[:id]][:data]["message"]}" : "" %></p>
+              </div>
+            </div>
+            <%= link_to "", chat_path(id: "group", group_id: group[:id]), { class: "stretched-link", data: { turbo_frame: "_top" } } %>
+          </div>
+        <% end %>
+
+        <% now = Time.zone.now %>
+        <% @sorted_user_ids.each do |user_id| %>
+
+          <% user = @users[user_id] %>
+
+          <% status = user[:data]["status"].present? ? user[:data]["status"] : "未設定" %>
+          <% distance = calc_distance(user) %>
+          <% angle = calc_angle(user) %>
+
+          <div class="chat_list">
+            <div class="chat_people">
+              <div class="chat_img"> 
+                <% if user.avatar.representable? %>
+                  <%= image_tag user.avatar.representation(resize_to_fill: [40, 40]), class: "user_icon" %>
+                <% else %>
+                  <button class="user_icon" type="button"><i class="fas fa-user" aria-hidden="true"></i></button>
+                <% end %>
+                <% if @unread_count[user[:id]] > 0 %>
+                  <div class="unread_icon text-white"><%= @unread_count[user[:id]] %></div>
+                <% end %>
+              </div>
+              <div class="chat_ib">
+                <div class="row">
+                  <div class="col-7">
+                    <span><h5 class="long_message"><%= "[#{status}] #{user[:name]}" %></h5></span>
+                  </div>
+                  <div class="col-5">
+                    <h5>
+                      <span class="chat_date"><%= "#{distance} km" %>
+                      <% if angle.present? %>
+                        <% # 方角として採用してるアイコンが右斜め上を向いてるのでよろしく傾ける %>
+                        <i class="fas fa-location-arrow" style="transform: rotate(<%= (angle + 45).to_s %>deg);"></i>
+                      <% end %>
+                      </span>
+                    </h5>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-9">
+                    <% if @last_user_message[user[:id]].present? %>
+                      <p class="long_message"><%= @last_user_message[user[:id]][:data]["message"] %></p>
+                    <% else %>
+                      <p class="long_message"></p>
+                    <% end %>
+                  </div>
+                  <div class="col-3">
+                    <% if @last_chat_times[user[:id]].present? %>
+                      <h5><span class="chat_date"><%= @last_chat_times[user[:id]] %></span></h5>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <%= link_to "", chat_path(id: user[:id]), { class: "stretched-link", data: { turbo_frame: "_top" } } %>
+          </div>
+        <% end %>
+
+      <% end %>
+    </div>
+
+  </div>
+
+</div>
+
+<%= render partial: "common/footer_menu" %>
+<%= render partial: "common/sidebar" %>
+<%= render partial: "common/geo" %>

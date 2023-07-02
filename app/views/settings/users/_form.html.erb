@@ -1,0 +1,164 @@
+
+
+<% @user.errors.full_messages.each do |message| %>
+  <div class="alert alert-warning"><%= message %></div>
+<% end %>
+
+<%= render partial: "common/flash_message" %>
+
+<% url = @user.new_record? ? settings_users_path : settings_user_path %>
+<% return_url = @current_user[:role] == USER_ROLE_ADMIN ? settings_users_path : settings_lists_path %>
+
+<%= form_with(model: @user, url: url) do |form| %>
+
+
+  <% if @user.authenticated_locked %>
+    <div class="row">
+      <div class="col mb-3 form-group">
+        <%= form.label :authenticated_unlock, "アカウントロック" %>
+        <%= form.select :authenticated_unlock, [["ロック", nil], ["解除", true]], { selected: nil }, { class: "form-control" } %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= form.label :avatar, "ユーザー画像" %>
+  <br>
+  <div class="mb-3 form-group">
+    <% if @user.avatar.representable? %>
+      <%= image_tag @user.avatar.variant(resize_to_fill: [40, 40]), class: "border rounded-circle" %>
+      <br>
+    <% end %>
+    <%= form.file_field :avatar, { class: "form-control" } %>
+  </div>
+
+  <%= form.label :identifier, "ID" %>
+  <div class="mb-3 form-group">
+    <%= form.text_field :identifier, { class: "form-control" } %>
+  </div>
+
+  <%= form.label :name, "名前" %>
+  <div class="mb-3 form-group">
+    <%= form.text_field :name, { class: "form-control" } %>
+  </div>
+  
+  <% if @current_user[:role] == USER_ROLE_ADMIN %>
+    <div class="mb-3 form-group">
+      <%= form.label :role, "権限" %>
+      <%= form.select :role, [["ユーザー", 1], ["管理者", 2]], {}, { class: "form-control" } %>  
+    </div>
+  <% end %>
+
+  <div class="row">
+    <div class="col mb-3 form-group">
+      <%= form.label :password, "新規パスワード ※半角英数" %>
+      <%= form.text_field :password, { class: "form-control", pattern: "^[0-9a-zA-Z]+$", placeholder: "新規パスワード", autocomplete: "off" } %>
+    </div>
+  </div>
+
+  <div class="row">
+        <div class="col mb-3 form-group">
+      <%= form.label :password_confirmation, "新パスワード(確認用)" %>
+      <%= form.text_field :password_confirmation, { class: "form-control", placeholder: "新規パスワード(確認用)", autocomplete: "off" } %>
+    </div>
+  </div>
+
+  <% @user_attribute_settings.each do |setting| %>
+
+    <% # テキストフォーム %>
+    <% if setting["type"] == "text" %>
+      <div class="row">
+        <div class="col mb-3 form-group">
+          <%= form.label setting["name"], setting["display_name"] %>
+          <%= form.text_field setting["name"], { class: "form-control", value: @user_attributes[setting["name"]] } %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # テキストエリアフォーム %>
+    <% if setting["type"] == "text_area" %>
+      <% row = setting["row"].present? ? setting["row"].to_s : "3" %>
+      <div class="mb-3 form-group">
+        <%= form.label setting["name"], setting["display_name"] %>
+        <%= form.text_area setting["name"], { class: "form-control", value: @user_attributes[setting["name"]], rows: row } %>
+      </div>
+    <% end %>
+
+    <% # 数値フォーム %>
+    <% if setting["type"] == "number" %>
+      <div class="row">
+        <div class="col mb-3 form-group">
+          <%= form.label setting["name"], setting["display_name"] %>
+          <%= form.number_field setting["name"], { class: "form-control", value: @user_attributes[setting["name"]].to_i } %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # 電話番号フォーム %>
+    <% if setting["type"] == "tel" %>
+      <div class="row">
+        <div class="col mb-3 form-group">
+          <%= form.label setting["name"], setting["display_name"] %>
+          <%= form.phone_field setting["name"], { class: "form-control", value: @user_attributes[setting["name"]] } %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # メールアドレスフォーム %>
+    <% if setting["type"] == "email" %>
+      <div class="row">
+        <div class="col mb-3 form-group">
+          <%= form.label setting["name"], setting["display_name"] %>
+          <%= form.email_field setting["name"], { class: "form-control", value: @user_attributes[setting["name"]] } %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # 日付フォーム %>
+    <% if setting["type"] == "date" %>
+      <div class="row">
+        <div class="col mb-3 form-group">
+          <%= form.label setting["name"], setting["display_name"] %>
+          <%= form.date_field setting["name"], { class: "form-control", value: @user_attributes[setting["name"]].strftime("%Y-%m-%d") } %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # 日時フォーム %>
+    <% if setting["type"] == "datetime" %>
+      <div class="row">
+        <div class="col mb-3 form-group">
+          <%= form.label setting["name"], setting["display_name"] %>
+          <%= form.datetime_field setting["name"], { class: "form-control", value: @user_attributes[setting["name"]].strftime("%Y-%m-%dT%H:%M") } %>
+        </div>
+      </div>
+    <% end %>
+
+    <% # セレクトフォーム %>
+    <% if setting["type"] == "select" %>
+      <div class="row">
+        <div class="col mb-3 form-group">
+          <%= form.label setting["name"], setting["display_name"] %>
+          <%= form.select setting["name"], setting["data"], { selected: @user_attributes[setting["name"]] }, { class: "form-control", multiple: setting["multiple"] } %>
+        </div>
+      </div>
+    <% end %>
+
+  <% end %>
+
+  <div class="mt-3">
+    <div class="row">
+      <div class="col">
+        <%= link_to "戻る", return_url, class: "btn btn-secondary w-100" %>
+      </div>
+      <% if @is_admin && !@user.new_record? && @user[:id] != @current_user[:id] %>
+        <div class="col">
+          <%= link_to "削除", settings_user_path(@user), class: "btn btn-danger w-100", data: { turbo_method: :delete, turbo_confirm: "ユーザーを削除しますか？" } %>
+        </div>
+      <% end %>
+      <div class="col">
+        <%= form.submit "登録", { class: "btn btn-warning w-100 float-end" } %>
+      </div>
+    </div>
+  </div>
+  
+<% end %>

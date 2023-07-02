@@ -1,0 +1,47 @@
+<%= turbo_frame_tag "sidebar" do %>
+  <div data-controller="sidebar">
+
+    <% # サイドバー閉じた状態のアイコン %>
+    <div class="fixed-top float-start m-1 w-25" >
+      <div data-action="click->sidebar#toggle" >
+        <% if @current_user.avatar.representable? %>
+          <%= image_tag @current_user.avatar.representation(resize_to_fill: [35, 35]), class: "my_icon" %>
+        <% else %>
+          <button class="my_icon" type="button"><i class="fas fa-user" aria-hidden="true"></i></button>
+        <% end %>
+      </div>
+    </div>
+
+    <% # サイドバー本体 %>
+    <div id="sidebar-content" class="sidebar bg-secondary" >
+
+      <% # サイドバー開いてる状態のアイコン %>
+      <div data-action="click->sidebar#toggle" >
+        <div class="m-1" >
+          <% if @current_user.avatar.representable? %>
+            <%= image_tag @current_user.avatar.representation(resize_to_fill: [35, 35]), class: "my_icon" %>
+          <% else %>
+            <button class="my_icon" type="button"><i class="fas fa-user" aria-hidden="true"></i></button>
+          <% end %>
+        </div>
+        <h4 class="text-white pt-1 ps-5">
+          <%= @current_user.name %>
+        </h4>
+      </div>
+
+      <div class="row m-3"></div>
+
+      <% @statuses.each do |status| %>
+        <div class="row m-3">
+          <% if @current_user[:data]["status"].present? && @current_user[:data]["status"] == status %>
+            <button class="btn btn-secondary btn-light disabled" data-action="click->sidebar#close" ><%= status %></button>
+          <% else %>
+            <%= link_to status, sidebar_index_path(status: status), { class: "btn btn-outline-secondary btn-light", data: { action: "click->sidebar#close" } } %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+<% end %>
+

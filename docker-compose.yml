@@ -1,0 +1,13 @@
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - ${DB_PORT:-3306}:3306
+  redis:
+    image: redis:6
+    restart: always
+    ports:
+      - ${REDIS_PORT:-6379}:6379

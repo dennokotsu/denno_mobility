@@ -1,0 +1,66 @@
+<% # フッターメニュー %>
+<div class="content_footer fixed-bottom">
+  <div class="row">
+    <% if @is_admin %>
+      <% # 管理者(PC)用スタイル %>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "chats" ? "btn-dark" : "btn-secondary" %>
+        <%= link_to chats_path, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-users"></i>
+        <% end %>
+      </div>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "chat" ? "btn-dark" : "btn-secondary" %>
+        <% chat_url = cookies[:last_chat_path].present? ? cookies[:last_chat_path] : chats_path %>
+        <%= link_to chat_url, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-user"></i>
+        <% end %>
+      </div>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "new_slip" ? "btn-dark" : "btn-secondary" %>
+        <%= link_to new_slip_path, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-file-alt"></i>
+        <% end %>
+      </div>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "slips" ? "btn-dark" : "btn-secondary" %>
+        <%= link_to slips_path, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-calendar-alt"></i>
+        <% end %>
+      </div>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "settings" ? "btn-dark" : "btn-secondary" %>
+        <%= link_to settings_lists_path, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-cogs"></i>
+        <% end %>
+      </div>
+    <% else %>
+      <% # 乗務員(スマホ)用スタイル %>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "chats" ? "btn-dark" : "btn-secondary" %>
+        <%= link_to chats_path, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-users"></i>
+        <% end %>
+      </div>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "chat" ? "btn-dark" : "btn-secondary" %>
+        <% chat_url = cookies[:last_chat_path].present? ? cookies[:last_chat_path] : chats_path %>
+        <%= link_to chat_url, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-user"></i>
+        <% end %>
+      </div>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "slips" ? "btn-dark" : "btn-secondary" %>
+        <%= link_to slips_path, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-calendar-alt"></i>
+        <% end %>
+      </div>
+      <div class="col text-center px-1">
+        <% btn_color_tag = @active_page == "settings" ? "btn-dark" : "btn-secondary" %>
+        <%= link_to settings_lists_path, { class: "w-100 btn #{btn_color_tag}", data: { turbo_frame: "_top" } } do %>
+          <i class="fas fa-cogs"></i>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
