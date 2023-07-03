@@ -2,6 +2,17 @@ require 'simplecov'
 SimpleCov.start 'rails'
 # ref. https://github.com/colszowka/simplecov#getting-started
 
+if ENV["CI"] == "true"
+  require 'simplecov-cobertura'
+  SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
+end
+# ref. simplecov-cobertura
+# https://docs.codecov.com/docs/supported-languages
+# https://github.com/codecov/example-ruby
+# https://github.com/dashingrocket/simplecov-cobertura
+# ref. ENV["CI"] and "true" value
+# https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'

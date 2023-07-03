@@ -72,6 +72,7 @@ group :development, :test do
   gem "rspec-parameterized-core"
   gem "factory_bot_rails"
   gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
 end
 
 group :development do
