@@ -31,6 +31,10 @@ jobs:
         run: bin/rails db:setup
       - name: Run tests
         run: bin/rake
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   lint:
     runs-on: ubuntu-latest
     steps:
