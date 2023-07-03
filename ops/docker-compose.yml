@@ -10,7 +10,7 @@ services:
     image: redis:6
     restart: always
   web:
-    image: dennokotsu/denno-mobility:v1.0.0
+    image: dennokotsu/denno_mobility:v1.0.0
     depends_on:
       - db
       - redis

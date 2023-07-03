@@ -4,9 +4,8 @@
 
 ```sh
 git clone https://github.com/dennokotsu/denno_mobility
-cd denno_mobility
+cd denno_mobility/ops
 
-cd ops
 bash setup.sh your-domain.example.com
 # "Setup succeeded!" is expected.
 # And `.env` is generated.
