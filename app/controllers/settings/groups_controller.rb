@@ -1,5 +1,4 @@
 class Settings::GroupsController < ApplicationController
-  protect_from_forgery except: [:destroy]
   before_action :roll_check
   before_action :set_users, only: %i[new edit update destroy]
 
