@@ -8,11 +8,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build
-      run: docker image build . -t denno_mobility:${{ github.ref_name }}
+      run: docker image build . -t dennokotsu/denno_mobility:${{ github.ref_name }}
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
         username: dennokotsu
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Push
-      run: docker image push denno_mobility:${{ github.ref_name }}
+      run: docker image push dennokotsu/denno_mobility:${{ github.ref_name }}
