@@ -1,5 +1,4 @@
 class Settings::UsersController < ApplicationController
-  protect_from_forgery except: [:destroy]
   before_action :set_user, only: %i[edit update destroy]
 
   def index
