@@ -34,15 +34,9 @@ class Settings::UsersController < ApplicationController
     position["longitude"] = nil
     @user[:data]["position"] = position
 
-    if @user.errors.present?
-      render :new, status: :unprocessable_entity
-      return
-    end
-
     if @user.save
       redirect_to settings_users_path, status: :see_other
     else
-      Rails.logger.error "Settings::UsersController ユーザー新規作成エラー : #{@user.error}"
       render :new, status: :unprocessable_entity
     end
   end
