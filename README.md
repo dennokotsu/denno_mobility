@@ -1,5 +1,10 @@
 # Denno Mobility
 
+[![Ruby](https://github.com/dennokotsu/denno_mobility/actions/workflows/ruby.yml/badge.svg)](https://github.com/dennokotsu/denno_mobility/actions?query=workflow%3ARuby)
+[![JavaScript](https://github.com/dennokotsu/denno_mobility/actions/workflows/js.yml/badge.svg)](https://github.com/dennokotsu/denno_mobility/actions?query=workflow%3AJavaScript)
+[![Docker Hub](https://github.com/dennokotsu/denno_mobility/actions/workflows/dockerhub.yml/badge.svg)](https://github.com/dennokotsu/denno_mobility/actions?query=workflow%3ADocker+Hub)
+[![codecov](https://codecov.io/gh/dennokotsu/denno_mobility/branch/main/graph/badge.svg?token=Z4VZQIRCJY)](https://codecov.io/gh/dennokotsu/denno_mobility)
+
 ## Get started
 
 ```sh
