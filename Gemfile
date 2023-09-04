@@ -91,7 +91,7 @@ group :development do
   # https://opiyotan.hatenablog.com/entry/rails-gem-letter_opener
   gem "letter_opener_web"
 
-  gem "rubocop", "1.54.0"
+  gem "rubocop", "1.56.2"
 end
 
 group :test do
